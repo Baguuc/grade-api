@@ -54,6 +54,31 @@ const app = express()
         
         res.end();
     })
+    .patch('/grades/:grade_id', async (req, res) => {
+        const grade_id = parseInt(req.params.grade_id);
+        const value = parseInt(req.body.value);
+
+        if(grade_id === null || 
+            !Number.isInteger(grade_id) || 
+            !Number.isFinite(grade_id)
+        ) {
+            res.status(400).send({ "error": "invalid grade_id" });
+            return;
+        }
+
+        if(value === null || 
+            !Number.isInteger(value) || 
+            !Number.isFinite(value)
+        ) {
+            res.status(400).send({ "error": "invalid value" });
+            return;
+        }
+
+        const sql = "UPDATE grades SET grade = $1 WHERE id = $2;";
+        const result = await database.query(sql, [value, grade_id]);
+        
+        res.end();
+    })
     .listen(3000, async () => {
         await database.connect();
         console.log('Server is running on port 3000');
